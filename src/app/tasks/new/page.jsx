@@ -11,6 +11,15 @@ function FormPage() {
   const router = useRouter()
   const params = useParams()
 
+  const getTask = async () => {
+    const res = await fetch(`/api/tasks/${params.id}`)
+    const data = await res.json()
+    setNewTask({
+      title: data.title,
+      description: data.description,
+    })
+  }
+
   const createTask = async () => {
     try {
       const res = await fetch('/api/tasks', {
@@ -40,7 +49,12 @@ function FormPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    await createTask()
+    if (!params.id) {
+      await createTask()
+    } else {
+      updateTask()
+    }
+    
   }
 
   const handleDelete = async () => {
@@ -57,8 +71,27 @@ function FormPage() {
     }
   }
 
+  const updateTask = async () => {
+    try {
+      const res = await fetch(`/api/tasks/${params.id}`, {
+        method: "PUT", 
+        body: JSON.stringify(newTask),
+        headers: {
+          "Content-Type": "application/json",
+        }
+      })
+      const data = await res.json()
+      router.push('/')
+      router.refresh()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
-    console.log(params)
+    if (params.id) {
+      getTask()
+    }
   }, [])
 
   return (
@@ -85,6 +118,7 @@ function FormPage() {
           placeholder="Title"
           className="bg-gray-800 border-2 w-full p-4 rounded-lg my-4"
           onChange={handleChange}
+          value={newTask.title}
           />
         <textarea 
           name="description" 
@@ -92,11 +126,14 @@ function FormPage() {
           placeholder="Description"
           className="bg-gray-800 border-2 w-full p-4 rounded-lg my-4"
           onChange={handleChange}
+          value={newTask.description}
           ></textarea>
         <button  
           className="bg-green-600 text-white font-semibold px-8 py-2 rounded-lg"
           type="submit">
-          Save
+          {
+              !params.id ? "Create" : "Update"
+          }
         </button>
       </form>
     </div>
