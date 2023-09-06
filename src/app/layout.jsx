@@ -1,4 +1,5 @@
 import './globals.css'
+import Navbar from '@/components/Navbar'
 
 export default function RootLayout({ children }) {
   return (
@@ -9,6 +10,7 @@ export default function RootLayout({ children }) {
       */}
       <head />
       <body>
+        <Navbar />
         <main className='container mx-auto px-5 mt-4'>
           {children}
         </main>
